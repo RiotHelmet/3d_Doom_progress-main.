@@ -6,22 +6,8 @@ socket.on("connect", () => {
   clientID = socket.id;
 });
 
-socket.on("connect_client", (ID) => {
-  if (loadingIn) {
-    connectedIDs.forEach((ID) => {
-      if (ID !== clientID) {
-        new Player(ID);
-      }
-    });
-    loadingIn = false;
-  }
 
-  if (ID !== clientID) {
-    new Player(ID);
-  }
-});
-
-socket.on("sendPlayerInformation", (data) => {
+socket.on("damagePlayer", (data) => {
   if (player.id == data.ID) {
     player.health -= 50;
     if (player.health <= 0) {
@@ -48,7 +34,19 @@ socket.on("disconnect_client", (ID) => {
 
 socket.on("updateConnections", (connectionArray) => {
   connectedIDs = connectionArray;
-  console.log(connectedIDs);
+  if(connectedIDs[connectedIDs.length - 1] !== clientID && connectedIDs[connectedIDs.length - 1] !== undefined) {
+    
+    let bool = false;
+
+    players.forEach(player => {
+      if(player.id == connectedIDs[connectedIDs.length - 1]) {
+        bool = true;
+      }
+    })
+    // if(bool) {
+      new Player(connectedIDs[connectedIDs.length - 1]);
+    // }
+  }
 });
 
 function updatePlayerPosition() {
@@ -80,9 +78,9 @@ socket.on("updateLeaderboard", function (data) {
   console.log(leaderboard);
 });
 
-socket.on("requestPlayerInformation_Client", (data) => {
+socket.on("requestPlayerinformation_Client", (data) => {
+  console.log(data.sender, clientID);
   if (data.sender !== clientID) {
-    console.log("ddd");
     socket.emit("recievePlayerInformation_Server", {
       position: player.position,
       rotation: player.rotation,
@@ -92,13 +90,13 @@ socket.on("requestPlayerInformation_Client", (data) => {
   }
 });
 
-socket.on("requestPlayerInformation_Client", (data) => {
+socket.on("recievePlayerInformation_Client", (data) => {
   for (let i = 0; i < players.length; i++) {
     const Player = players[i];
-
-    if ((Player.id = data.id)) {
+    if ((Player.id == data.id)) {
       Player.position = data.position;
       Player.rotation = data.rotation;
+      Player.shape.position = data.position;
       break;
     }
   }

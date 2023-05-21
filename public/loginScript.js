@@ -1,10 +1,6 @@
 var socket = io();
 
-// let clientID;
 
-// socket.on("connect", () => {
-//     clientID = socket.id;
-//   });
 
 loginPage = document.getElementById("loginMenu");
 loginForm = document.getElementById("loginForm");
@@ -27,10 +23,11 @@ loginForm.addEventListener("submit", function (e) {
 
 socket.on("login", (data) => {
   if (data.ID == clientID) {
-    document.cookie = data.userID;
+    // document.cookie = data.userID;
     game.playing = true;
 
     player.id = clientID;
+
     connectedIDs.forEach((ID) => {
       if (ID !== clientID) {
         new Player(ID);
@@ -41,9 +38,5 @@ socket.on("login", (data) => {
 
     document.getElementById("leaderboard").style.display = "flex";
     loginPage.style.display = "none";
-  }
-
-  if (data.ID !== clientID) {
-    new Player(data.ID);
   }
 });

@@ -37,6 +37,12 @@ canvas {
   height: 95vh;
 }
 
+#canvas_2D_map {
+  position: absolute;
+  right: 5vw;
+  top: 5vh;
+}
+
 #settingsMenu {
   width: 95vw;
   height: 95vh;

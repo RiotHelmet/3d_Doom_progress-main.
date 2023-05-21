@@ -1,3 +1,4 @@
+
 function drawWall(vertices, color) {
   ctx.beginPath();
 
@@ -7,8 +8,11 @@ function drawWall(vertices, color) {
   ctx.lineTo(vertices[2].x, vertices[2].y);
 
   ctx.fillStyle = color;
+  // ctx.stroke()
   ctx.fill();
 }
+
+
 
 function draw2d() {
   ctx_2d.beginPath();
@@ -235,23 +239,23 @@ function draw3d(Object) {
     }
 
     p1 = {
-      x: (world_1.x * 200) / world_1.y + screenWidth / 2,
-      y: (world_1.z * 200) / world_1.y + screenHeight / 2,
+      x: (world_1.x * 300) / world_1.y + screenWidth / 2,
+      y: (world_1.z * 300) / world_1.y + screenHeight / 2,
     };
 
     p2 = {
-      x: (world_2.x * 200) / world_2.y + screenWidth / 2,
-      y: (world_2.z * 200) / world_2.y + screenHeight / 2,
+      x: (world_2.x * 300) / world_2.y + screenWidth / 2,
+      y: (world_2.z * 300) / world_2.y + screenHeight / 2,
     };
 
     p3 = {
-      x: (world_3.x * 200) / world_3.y + screenWidth / 2,
-      y: (world_3.z * 200) / world_3.y + screenHeight / 2,
+      x: (world_3.x * 300) / world_3.y + screenWidth / 2,
+      y: (world_3.z * 300) / world_3.y + screenHeight / 2,
     };
 
     p4 = {
-      x: (world_4.x * 200) / world_4.y + screenWidth / 2,
-      y: (world_4.z * 200) / world_4.y + screenHeight / 2,
+      x: (world_4.x * 300) / world_4.y + screenWidth / 2,
+      y: (world_4.z * 300) / world_4.y + screenHeight / 2,
     };
 
     if (surface == 1) {
@@ -260,6 +264,10 @@ function draw3d(Object) {
     } else if (surface == 2) {
       pairs.push(p1);
       pairs.push(p2);
+    }
+
+    if(Object.faceColors[i] == "none") {
+      continue;
     }
 
     if (surfaceNormal.x * viewVector.x + surfaceNormal.y * viewVector.y < 0) {
@@ -277,9 +285,12 @@ function draw3d(Object) {
     y1 = -player.position.y + Object.position.y;
     z1 = -(player.position.z + 90) + Object.position.z + Object.height;
 
+
     world_x1 = x1 * CS - y1 * SN;
 
     world_y1 = y1 * CS + x1 * SN;
+
+    Object.distance = distance(world_x1, 0, world_y1, 0);
 
     if (world_y1 > 0) {
       world_z1 = z1 + (player.tilt * world_y1) / 32;
@@ -287,13 +298,13 @@ function draw3d(Object) {
       world_1 = { x: world_x1, y: world_y1, z: world_z1 };
 
       p1 = {
-        x: (world_1.x * 200) / world_1.y + screenWidth / 2,
-        y: (world_1.z * 200) / world_1.y + screenHeight / 2,
+        x: (world_1.x * 300) / world_1.y + screenWidth / 2,
+        y: (world_1.z * 300) / world_1.y + screenHeight / 2,
       };
 
       p2 = {
-        x: (world_1.x * 200) / world_1.y + screenWidth / 2,
-        y: ((world_1.z + Object.height) * 200) / world_1.y + screenHeight / 2,
+        x: (world_1.x * 300) / world_1.y + screenWidth / 2,
+        y: ((world_1.z + Object.height) * 300) / world_1.y + screenHeight / 2,
       };
 
       animation(
@@ -311,7 +322,9 @@ function draw3d(Object) {
     drawSurface(pairs, Object.faceColors[Object.faceColors.length - 1]);
   }
 
-  Object.distance /= Object.faces.length;
+  if(!Object.isPlayer) {
+    Object.distance /= Object.faces.length;
+  }
 }
 
 function clear() {

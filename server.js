@@ -39,7 +39,7 @@ var con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "shooter_Database",
+  database: "shooterDatabase",
 });
 
 app.get("/editor", function (req, res) {
@@ -58,9 +58,8 @@ con.connect(function (err) {
 
   io.sockets.on("connection", (socket) => {
     console.log(`⚡ : A user has connected : ${socket.id}`);
-    connectedIds.push(socket.id);
+
     // leaderboard.push(new playerInfo(socket.id));
-    io.emit("updateConnections", connectedIds);
     // io.emit("connect_client", socket.id);
 
     // Request Player info, position etc.
@@ -69,7 +68,7 @@ con.connect(function (err) {
       io.emit("requestPlayerinformation_Client", data);
     });
     socket.on("recievePlayerInformation_Server", (data) => {
-      console.log("Recieved from ", data.sender);
+      console.log("Recieved from ", data.id);
       io.emit("recievePlayerInformation_Client", data);
     });
 
@@ -97,7 +96,7 @@ con.connect(function (err) {
     });
 
     socket.on("raycastHIT", (data) => {
-      io.emit("sendPlayerInformation", data);
+      io.emit("damagePlayer", data);
     });
 
     socket.on("loginRequest", (data) => {
@@ -114,13 +113,18 @@ con.connect(function (err) {
           if (err) throw err;
           if (result[0]) {
             if (result[0].password == hashPassword(data.password)) {
+
+              connectedIds.push(data.ID);
+              io.emit("updateConnections", connectedIds);
+              console.log(connectedIds)
+
               io.emit("login", {
                 userID: result[0].userID,
                 username: data.username,
                 ID: data.ID,
               });
-
               console.log("Login successful");
+              
             } else {
               console.log("Login failed");
             }

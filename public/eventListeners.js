@@ -11,6 +11,11 @@ document.addEventListener("keydown", function (e) {
 });
 document.addEventListener("keyup", function (e) {
   keys[e.key] = false;
+  if(e.key == " " ) {
+    if(game.playing) {
+      player.shoot();
+    }
+  }
 });
 
 document.addEventListener("keydown", function (e) {
@@ -28,6 +33,6 @@ canvas.addEventListener("click", async () => {
   await canvas.requestPointerLock();
 });
 
-// canvas.addEventListener("mousedown", function () {
-//   player.shoot();
-// });
+canvas.addEventListener("mousedown", function () {
+  player.shoot();
+});
