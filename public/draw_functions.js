@@ -1,4 +1,3 @@
-
 function drawWall(vertices, color) {
   ctx.beginPath();
 
@@ -7,12 +6,10 @@ function drawWall(vertices, color) {
   ctx.lineTo(vertices[3].x, vertices[3].y);
   ctx.lineTo(vertices[2].x, vertices[2].y);
 
-  ctx.fillStyle = color;
-  // ctx.stroke()
+  ctx.fillStyle = "grey";
+  ctx.stroke();
   ctx.fill();
 }
-
-
 
 function draw2d() {
   ctx_2d.beginPath();
@@ -92,7 +89,7 @@ function draw2d() {
 }
 
 function drawSurface(vertices, color) {
-  ctx.fillStyle = color;
+  ctx.fillStyle = "rgb(100,100,100)";
   ctx.beginPath();
 
   ctx.moveTo(vertices[0].x, vertices[0].y);
@@ -103,6 +100,7 @@ function drawSurface(vertices, color) {
     ctx.lineTo(vertex.x, vertex.y);
   }
   ctx.lineTo(vertices[0].x, vertices[0].y);
+  ctx.stroke();
   ctx.fill();
 }
 
@@ -266,7 +264,7 @@ function draw3d(Object) {
       pairs.push(p2);
     }
 
-    if(Object.faceColors[i] == "none") {
+    if (Object.faceColors[i] == "none") {
       continue;
     }
 
@@ -284,7 +282,6 @@ function draw3d(Object) {
     x1 = -player.position.x + Object.position.x;
     y1 = -player.position.y + Object.position.y;
     z1 = -(player.position.z + 90) + Object.position.z + Object.height;
-
 
     world_x1 = x1 * CS - y1 * SN;
 
@@ -322,7 +319,7 @@ function draw3d(Object) {
     drawSurface(pairs, Object.faceColors[Object.faceColors.length - 1]);
   }
 
-  if(!Object.isPlayer) {
+  if (!Object.isPlayer) {
     Object.distance /= Object.faces.length;
   }
 }

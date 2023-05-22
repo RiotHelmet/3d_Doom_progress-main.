@@ -1,7 +1,5 @@
 var socket = io();
 
-
-
 loginPage = document.getElementById("loginMenu");
 loginForm = document.getElementById("loginForm");
 
@@ -27,10 +25,14 @@ socket.on("login", (data) => {
     game.playing = true;
 
     player.id = clientID;
+    player.data.userId = data.userId;
+    player.data.username = data.username;
+
+    document.getElementById("username").innerHTML = player.data.username;
 
     connectedIDs.forEach((ID) => {
-      if (ID !== clientID) {
-        new Player(ID);
+      if (ID !== clientID && ID !== connectedIDs[connectedIDs.length - 1]) {
+        new Player(ID, data.userID, data.username);
       }
     });
 

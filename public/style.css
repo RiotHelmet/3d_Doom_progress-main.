@@ -25,6 +25,7 @@ body {
   overflow: hidden;
 }
 
+
 canvas {
   border: 2px solid black;
   /* cursor: none; */
@@ -74,11 +75,25 @@ canvas {
   color: white;
 }
 
-#healthCount {
+#UI {
+  width: 95vw;
+  height: 5vh;
   position: absolute;
+  bottom: 2.5vh;
+  display: flex;
+  align-items: center;
+}
+
+#username {
   color: black;
-  bottom: 5vh;
-  right: 20vw;
+  margin-left: 100px;
+  margin-right: auto;
+}
+
+#healthCount {
+  color: black;
+  margin-left: auto;
+  margin-right: 100px;
 }
 
 #leaderboard {

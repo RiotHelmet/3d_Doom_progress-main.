@@ -6,15 +6,21 @@ socket.on("connect", () => {
   clientID = socket.id;
 });
 
-
 socket.on("damagePlayer", (data) => {
+  console.log(data);
   if (player.id == data.ID) {
     player.health -= 50;
     if (player.health <= 0) {
       socket.emit("playerKilled", data);
+      socket.emit("updatePlayerStats", { shooterName: player.data.username });
 
-      alert("DEAD");
-      player.position = { x: 0, y: 0, z: 0 };
+      let spawnPosition = spawns[Math.round(Math.random() * spawns.length)];
+
+      player.position = {
+        x: spawnPosition.x,
+        y: spawnPosition.y,
+        z: spawnPosition.z,
+      };
       player.health = 100;
     }
   }
@@ -34,17 +40,19 @@ socket.on("disconnect_client", (ID) => {
 
 socket.on("updateConnections", (connectionArray) => {
   connectedIDs = connectionArray;
-  if(connectedIDs[connectedIDs.length - 1] !== clientID && connectedIDs[connectedIDs.length - 1] !== undefined) {
-    
+  if (
+    connectedIDs[connectedIDs.length - 1] !== clientID &&
+    connectedIDs[connectedIDs.length - 1] !== undefined
+  ) {
     let bool = false;
 
-    players.forEach(player => {
-      if(player.id == connectedIDs[connectedIDs.length - 1]) {
+    players.forEach((player) => {
+      if (player.id == connectedIDs[connectedIDs.length - 1]) {
         bool = true;
       }
-    })
+    });
     // if(bool) {
-      new Player(connectedIDs[connectedIDs.length - 1]);
+    new Player(connectedIDs[connectedIDs.length - 1]);
     // }
   }
 });
@@ -93,7 +101,7 @@ socket.on("requestPlayerinformation_Client", (data) => {
 socket.on("recievePlayerInformation_Client", (data) => {
   for (let i = 0; i < players.length; i++) {
     const Player = players[i];
-    if ((Player.id == data.id)) {
+    if (Player.id == data.id) {
       Player.position = data.position;
       Player.rotation = data.rotation;
       Player.shape.position = data.position;
