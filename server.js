@@ -39,7 +39,7 @@ var con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "shooterDatabase",
+  database: "shooter_Database",
 });
 
 app.get("/editor", function (req, res) {
@@ -75,6 +75,35 @@ con.connect(function (err) {
     // Update Player Position
     socket.on("updatePlayerPosition", (data) => {
       io.emit("sendPlayerPosition", data);
+    });
+
+    socket.on("updatePlayerStats", (data) => {
+      con.query(
+        `
+          SELECT * FROM
+            userdata
+      
+          WHERE username = '${data.shooterName}'
+          `,
+        function (err, result, fields) {
+          if (err) throw err;
+          if (result[0]) {
+            console.log(result[0].kills);
+            con.query(
+              `
+                UPDATE userdata
+      
+                SET kills = ${result[0].kills + 1}
+            
+                WHERE username = '${data.shooterName}'
+                `,
+              function (err, result, fields) {
+                if (err) throw err;
+              }
+            );
+          }
+        }
+      );
     });
 
     socket.on("playerKilled", (data) => {
@@ -113,10 +142,9 @@ con.connect(function (err) {
           if (err) throw err;
           if (result[0]) {
             if (result[0].password == hashPassword(data.password)) {
-
               connectedIds.push(data.ID);
               io.emit("updateConnections", connectedIds);
-              console.log(connectedIds)
+              console.log(connectedIds);
 
               io.emit("login", {
                 userID: result[0].userID,
@@ -124,7 +152,6 @@ con.connect(function (err) {
                 ID: data.ID,
               });
               console.log("Login successful");
-              
             } else {
               console.log("Login failed");
             }
