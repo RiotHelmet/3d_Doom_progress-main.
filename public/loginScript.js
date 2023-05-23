@@ -1,4 +1,5 @@
 var socket = io();
+let loggedIn = false;
 
 loginPage = document.getElementById("loginMenu");
 loginForm = document.getElementById("loginForm");
@@ -22,7 +23,7 @@ loginForm.addEventListener("submit", function (e) {
 socket.on("login", (data) => {
   if (data.ID == clientID) {
     // document.cookie = data.userID;
-    game.playing = true;
+    loggedIn = true;
 
     player.id = clientID;
     player.data.userId = data.userId;
@@ -38,7 +39,8 @@ socket.on("login", (data) => {
 
     socket.emit("requestPlayerInformation_Server", { sender: clientID });
 
-    document.getElementById("leaderboard").style.display = "flex";
+    document.getElementById("leaderboard").style.display = "none";
     loginPage.style.display = "none";
+    updatePlayerPosition();
   }
 });

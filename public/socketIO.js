@@ -7,12 +7,10 @@ socket.on("connect", () => {
 });
 
 socket.on("damagePlayer", (data) => {
-  console.log(data);
   if (player.id == data.ID) {
     player.health -= 50;
     if (player.health <= 0) {
       socket.emit("playerKilled", data);
-      socket.emit("updatePlayerStats", { shooterName: player.data.username });
 
       let spawnPosition = spawns[Math.round(Math.random() * spawns.length)];
 
@@ -21,6 +19,7 @@ socket.on("damagePlayer", (data) => {
         y: spawnPosition.y,
         z: spawnPosition.z,
       };
+      updatePlayerPosition();
       player.health = 100;
     }
   }
@@ -29,13 +28,33 @@ socket.on("damagePlayer", (data) => {
 socket.on("disconnect_client", (ID) => {
   for (let i = 0; i < players.length; i++) {
     if (players[i].id == ID) {
-      console.log(objects);
       objects.splice(objects.indexOf(players[i].shape), 1);
-      console.log(objects);
 
       players.splice(i, 1);
     }
   }
+});
+
+let wait;
+
+socket.on("alert", (message) => {
+  if (wait) {
+    clearTimeout(wait);
+  }
+
+  const element = document.getElementById("alertBox");
+
+  element.innerHTML = `${message}`;
+
+  element.classList.remove("animate");
+  element.style.opacity = 1;
+  void element.offsetWidth;
+  element.style.display = "block";
+  element.classList.add("animate");
+
+  wait = setTimeout(() => {
+    element.style.display = "none";
+  }, 5000);
 });
 
 socket.on("updateConnections", (connectionArray) => {
@@ -72,22 +91,31 @@ socket.on("sendPlayerPosition", function (data) {
 });
 
 socket.on("updateLeaderboard", function (data) {
-  leaderboard = data.leaderboard;
+  if (data.id == clientID) {
+    let results = data.res;
 
-  document.getElementById("leaderboard").innerHTML = "";
-  for (let i = 0; i < leaderboard.length; i++) {
-    if (leaderboard[i].kills > 0) {
-      document.getElementById(
-        "leaderboard"
-      ).innerHTML += `<div class="leaderboardIcon"><h1>${leaderboard[i].kills}</h1></div>`;
+    for (let i = 0; i < results.length - 1; i++) {
+      for (let j = 0; j < results.length - i - 1; j++) {
+        if (results[j].kills < results[j + 1].kills) {
+          let st = results[j];
+          results[j] = results[j + 1];
+          results[j + 1] = st;
+        }
+      }
+    }
+
+    for (let i = 0; i < 10; i++) {
+      if (results[i]) {
+        const result = results[i];
+        document.getElementById("leaderboard").innerHTML += `
+        <div class="leaderboardSlot">${result.username} : ${result.kills} kills</div>
+        `;
+      }
     }
   }
-
-  console.log(leaderboard);
 });
 
 socket.on("requestPlayerinformation_Client", (data) => {
-  console.log(data.sender, clientID);
   if (data.sender !== clientID) {
     socket.emit("recievePlayerInformation_Server", {
       position: player.position,

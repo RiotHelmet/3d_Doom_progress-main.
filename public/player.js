@@ -133,7 +133,7 @@ function updateOtherPlayers(ID, position, rotation) {
       if (position.x !== players[i].position.x) {
         players[i].animation.walking = true;
         players[i].animation.idle = false;
-        players[i].animation.walking_step += 0.05;
+        players[i].animation.walking_step += 0.01 * deltaT;
         if (players[i].animation.walking_step > 4) {
           players[i].animation.walking_step = 0;
         }
@@ -309,7 +309,7 @@ function updatePlayerMovement() {
     // player.position.z += 10;
   }
 
-  player.rotation += (deltaMouse.x / sensitivity) * deltaT;
+  player.rotation += (deltaMouse.x / (sensitivity * 200)) * deltaT;
 
   // player.tilt += deltaMouse.y / 5;
 

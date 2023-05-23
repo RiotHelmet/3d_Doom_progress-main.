@@ -1,7 +1,6 @@
 @font-face {
   font-family: "arcade";
   src: url(ARCADECLASSIC.TTF);
-
 }
 
 * {
@@ -25,6 +24,11 @@ body {
   overflow: hidden;
 }
 
+#waitingBox {
+  position: absolute;
+  z-index: 100;
+  font-size: xx-large;
+}
 
 canvas {
   border: 2px solid black;
@@ -40,6 +44,7 @@ canvas {
 
 #canvas_2D_map {
   position: absolute;
+  display: none;
   right: 5vw;
   top: 5vh;
 }
@@ -53,12 +58,10 @@ canvas {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-
 }
 #settingsMenu h1 {
   color: white;
 }
-
 
 #loginMenu {
   width: 95vw;
@@ -96,17 +99,49 @@ canvas {
   margin-right: 100px;
 }
 
+#alertBox {
+  width: fit-content;
+  height: fit-content;
+  position: absolute;
+  top: 10vh;
+  left: 8vw;
+  font-size: x-large;
+}
+
+.animate {
+  animation: fadeOut 5s ease-out;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 #leaderboard {
-  background-color: wheat; 
-  height: 6vh;
-  width: 30vw;
-  top: 5vh;
-  display: none;
+  background-color: white;
+  height: fit-content;
+  width: 15vw;
+  right: 10vw;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   position: absolute;
 }
 
-
+.leaderboardSlot {
+  width: 90%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: larger;
+}
 
 .leaderboardIcon {
   background-image: url(images/head.png);
