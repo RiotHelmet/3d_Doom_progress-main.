@@ -25,21 +25,22 @@ function getRandomColor() {
 
 class playerInfo {
   kills = 0;
-  color = getRandomColor();
-  constructor(_ID) {
+  username;
+  constructor(_ID, _username) {
     this.ID = _ID;
+    this.username = _username;
   }
 }
 
 // connection
 
-let leaderboard = [];
+let players = [];
 
 var con = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "",
-  database: "shooter_Database",
+  database: "shooterDatabase",
 });
 
 app.get("/editor", function (req, res) {
@@ -58,9 +59,16 @@ con.connect(function (err) {
 
   io.sockets.on("connection", (socket) => {
     console.log(`⚡ : A user has connected : ${socket.id}`);
-
-    // leaderboard.push(new playerInfo(socket.id));
-    // io.emit("connect_client", socket.id);
+    con.query(
+      `
+        SELECT * FROM
+          userdata
+        `,
+      function (err, result, fields) {
+        if (err) throw err;
+        io.emit("updateLeaderboard", { res: result, id: socket.id });
+      }
+    );
 
     // Request Player info, position etc.
     socket.on("requestPlayerInformation_Server", (data) => {
@@ -77,51 +85,51 @@ con.connect(function (err) {
       io.emit("sendPlayerPosition", data);
     });
 
-    socket.on("updatePlayerStats", (data) => {
-      con.query(
-        `
-          SELECT * FROM
-            userdata
-      
-          WHERE username = '${data.shooterName}'
-          `,
-        function (err, result, fields) {
-          if (err) throw err;
-          if (result[0]) {
-            console.log(result[0].kills);
-            con.query(
-              `
-                UPDATE userdata
-      
-                SET kills = ${result[0].kills + 1}
-            
-                WHERE username = '${data.shooterName}'
-                `,
-              function (err, result, fields) {
-                if (err) throw err;
-              }
-            );
-          }
-        }
-      );
-    });
-
     socket.on("playerKilled", (data) => {
-      leaderboard.forEach((Player) => {
-        console.log(Player.ID, data.shooterID);
+      let KILLER;
+      let KILLED;
+      players.forEach((Player) => {
         if (Player.ID == data.shooterID) {
           Player.kills++;
+          KILLER = Player.username;
+          console.log(Player.username);
+
+          con.query(
+            `
+              SELECT * FROM
+                userdata
+          
+              WHERE username = '${Player.username}'
+              `,
+            function (err, result, fields) {
+              if (err) throw err;
+              if (result[0]) {
+                console.log(result[0].kills);
+                con.query(
+                  `
+                    UPDATE userdata
+          
+                    SET kills = ${result[0].kills + 1}
+                
+                    WHERE username = '${Player.username}'
+                    `,
+                  function (err, result, fields) {
+                    if (err) throw err;
+                  }
+                );
+              }
+            }
+          );
         }
       });
 
-      for (let i = 0; i < leaderboard.length - 1; i++) {
-        if (leaderboard[i].kills < leaderboard[i + 1].kills) {
-          p = leaderboard[i + 1];
-          leaderboard[i + 1] = leaderboard[i];
-          leaderboard[i] = p;
+      players.forEach((Player) => {
+        if (Player.ID == data.ID) {
+          KILLED = Player.username;
         }
-      }
-      io.emit("updateLeaderboard", { leaderboard: leaderboard });
+      });
+
+      io.emit("alert", `${KILLER} KILLED ${KILLED}`);
     });
 
     socket.on("raycastHIT", (data) => {
@@ -131,6 +139,11 @@ con.connect(function (err) {
     socket.on("loginRequest", (data) => {
       console.log(data);
 
+      for (let i = 0; i < players.length; i++) {
+        if (players[i].username == data.username) {
+          return false;
+        }
+      }
       con.query(
         `
           SELECT * FROM
@@ -145,6 +158,8 @@ con.connect(function (err) {
               connectedIds.push(data.ID);
               io.emit("updateConnections", connectedIds);
               console.log(connectedIds);
+
+              players.push(new playerInfo(data.ID, data.username));
 
               io.emit("login", {
                 userID: result[0].userID,
